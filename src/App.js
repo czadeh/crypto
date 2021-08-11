@@ -1,12 +1,15 @@
 import React, {useState, useEffect} from "react";
 import Button from "./components/Button";
-import InputNumber from 'react-input-number';
+import Steps from "./components/Steps";
 import MainMenu from "./components/MainMenu";
+import InputMenu from "./components/InputMenu";
 import ResultMenu from "./components/ResultMenu";
+import AnalysisMenu from "./components/AnalysisMenu";
 
 const START_STATE = 0;
 const INPUT_STATE = 1;
 const RESULT_STATE = 2;
+const ANALYSIS_STATE = 3;
 
 const App = () => {
   const [quantity, setQuantity] = useState(42);
@@ -27,38 +30,54 @@ const App = () => {
     }
   };
 
+  const clickNext = () => {
+    if (pageState < 3) {
+      setPageState(pageState + 1)
+    } else {
+      setPageState(0)
+    }
+  };
+
+  const clickStep = (step) => {
+    setPageState(step);
+  };
+
   let screen;
   if (pageState === START_STATE) {
     screen = <MainMenu></MainMenu>
-  } else if (pageState === INPUT_STATE) {
-    screen = <h1>Input</h1>;
+  } 
+  else if (pageState === INPUT_STATE) {
+    screen = <InputMenu 
+      price={price} setPrice={setPrice}
+      quantity={quantity} setQuantity={setQuantity} 
+      selection={selection} dropSelect={dropSelect}></InputMenu>;
   }
   else if (pageState === RESULT_STATE) {
     screen = <ResultMenu></ResultMenu>;
-
+  }
+  else if (pageState === ANALYSIS_STATE) {
+    screen = <AnalysisMenu
+      price={price} quantity={quantity}
+      ></AnalysisMenu>;
   }
 
   return (
-    <div className="w-full h-screen flex flex-row justify-center">
-      {screen}
-      <div className="flex flex-col justify-center">
-        <label>{selection} selected</label>
-        <select value={selection} onChange={dropSelect}>
-          <option value={1}>BTC</option>
-          <option value={2}>ETH</option>
-        </select>
-        <label>Input quantity {quantity}</label>
-        <InputNumber min={0} step={1} value={quantity} onChange={setQuantity} className='bg-red-400 h-20 w-20'/>
-        <label>Input price {price}</label>
-        <InputNumber min={0} step={1} value={price} onChange={setPrice} className='bg-red-400 h-20 w-20'/>
+    <>
+    <div className="flex flex-col justify-center">
+      <Steps buttonFunc={clickNext} setStep={(step) => clickStep(step)}/>
+    </div>
+    <div className="w-full h-auto flex flex-row justify-center">
 
+      <div className="flex flex-col justify-center">
+      {screen}
         
         <Button onClick={handleAdd}>
           Submit
         </Button>
-        <h1>{quantity * price}</h1>
+
       </div>
     </div>
+    </>
   );
 };
 
